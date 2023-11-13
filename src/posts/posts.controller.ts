@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseIntPipe, Patch,
   Post,
   Put,
   UseGuards,
@@ -13,6 +13,8 @@ import { PostsService } from './posts.service';
 import {AccessTokenGuard} from "../auth/guard/bearer-token.guard";
 import {UsersModel} from "../users/entities/users.entity";
 import {User} from "../users/decorator/user.decorator";
+import {CreatePostDto} from "./dto/create-post.dto";
+import {UpdatePostDto} from "./dto/update-post.dto";
 
 
 
@@ -34,22 +36,20 @@ export class PostsController {
   @UseGuards(AccessTokenGuard)
   postPost(
       @User('id') userId: number,
-      @Body('title') title: string,
-      @Body('content') content: string,
+      @Body() body: CreatePostDto,
   ) {
 
     return this.postsService.createPost(
-        userId, title, content
+        userId, body,
     )
   }
-  @Put(':id')
-  putPost(
+  @Patch(':id')
+  patchPost(
       @Param('id', ParseIntPipe) id: number,
-      @Body('title') title?: string,
-      @Body('content') content?: string,
+      @Body() body: UpdatePostDto
   ) {
     return this.postsService.updatePost(
-        id, title, content
+        id, body
     )
   }
 
