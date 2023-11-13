@@ -1,5 +1,18 @@
-import {Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseIntPipe, Post, Put} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
+import {AccessTokenGuard} from "../auth/guard/bearer-token.guard";
+import {UsersModel} from "../users/entities/users.entity";
+import {User} from "../users/decorator/user.decorator";
 
 
 
@@ -18,13 +31,15 @@ export class PostsController {
   }
 
   @Post()
+  @UseGuards(AccessTokenGuard)
   postPost(
-      @Body('authorId') authorId: number,
+      @User('id') userId: number,
       @Body('title') title: string,
       @Body('content') content: string,
   ) {
+
     return this.postsService.createPost(
-        authorId, title, content
+        userId, title, content
     )
   }
   @Put(':id')
