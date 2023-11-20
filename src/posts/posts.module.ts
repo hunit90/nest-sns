@@ -5,6 +5,8 @@ import {TypeOrmModule} from "@nestjs/typeorm";
 import {PostsModel} from "./entities/posts.entity";
 import {AuthModule} from "../auth/auth.module";
 import {UsersModule} from "../users/users.module";
+import {CommonService} from "../common/common.service";
+import {CommonModule} from "../common/common.module";
 
 @Module({
   imports: [
@@ -12,7 +14,8 @@ import {UsersModule} from "../users/users.module";
           PostsModel,
       ]),
       AuthModule,
-      UsersModule
+      UsersModule,
+      CommonModule,
   ],
   controllers: [PostsController],
   providers: [PostsService],
