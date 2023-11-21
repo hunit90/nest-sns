@@ -1,4 +1,4 @@
-import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {Column, Entity, ManyToOne } from "typeorm";
 import {UsersModel} from "../../users/entities/users.entity";
 import {BaseModel} from "../../common/entity/base.entity";
 import {IsString} from "class-validator";
@@ -22,6 +22,11 @@ export class PostsModel extends BaseModel {
         message: stringValidationMessage,
     })
     content: string;
+
+    @Column({
+        nullable: true,
+    })
+    image?: string;
 
     @Column()
     likeCount: number;
