@@ -1,5 +1,5 @@
 import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
-import {FindOptionsWhere, LessThan, MoreThan, Repository} from "typeorm";
+import {FindOptionsWhere, LessThan, MoreThan, QueryRunner, Repository} from "typeorm";
 import {PostsModel} from "./entities/posts.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CreatePostDto} from "./dto/create-post.dto";
@@ -141,39 +141,17 @@ export class PostsService {
         return post;
     }
 
-    async createPostImage(dto: CreatePostImageDto){
-        const tempFilePath = join(
-            PUBLIC_FOLDER_PATH,
-            dto.path,
-        )
-
-        try {
-            await promises.access(tempFilePath);
-        } catch (e) {
-            throw new BadRequestException('존재하지 않는 파일입니다.')
-        }
-
-        const fileName = basename(tempFilePath)
-
-        const newPath = join(
-            POST_IMAGE_PATH,
-            fileName,
-        )
-
-        const result = await this.imageRepository.save({
-            ...dto,
-        })
-
-        await promises.rename(tempFilePath, newPath)
-
-        return result;
+    getRepository(qr?: QueryRunner) {
+        return qr ? qr.manager.getRepository<PostsModel>(PostsModel) : this.postsRepository
     }
 
-    async createPost(authorId: number, postDto: CreatePostDto, image?: string) {
+    async createPost(authorId: number, postDto: CreatePostDto, qr?: QueryRunner) {
         // 1) create -> 저장할 객체를 생성한다.
         // 2) save -> 객체를 저장한다. (create 메서드에서 생성한 객체로)
 
-        const post = this.postsRepository.create({
+        const repository = this.getRepository(qr);
+
+        const post = repository.create({
             author:{
                 id: authorId,
             },
@@ -183,7 +161,7 @@ export class PostsService {
             commentCount: 0,
         });
 
-        const newPost = await this.postsRepository.save(post);
+        const newPost = await repository.save(post);
 
         return newPost;
     }

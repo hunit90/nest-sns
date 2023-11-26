@@ -7,11 +7,17 @@ import {CreatePostDto} from "./dto/create-post.dto";
 import {UpdatePostDto} from "./dto/update-post.dto";
 import {PaginatePostDto} from "./dto/paginate-post.dto";
 import {ImageModelType} from "../common/entity/image.entity";
+import {DataSource} from "typeorm";
+import {PostsImagesService} from "./iamge/images.service";
 
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+      private readonly postsService: PostsService,
+      private readonly postsImagesService: PostsImagesService,
+      private readonly dataSource: DataSource,
+  ) {}
 
   @Get()
   getPosts(
@@ -39,21 +45,32 @@ export class PostsController {
       @User('id') userId: number,
       @Body() body: CreatePostDto,
   ) {
+    const qr = this.dataSource.createQueryRunner();
 
-    const post = await this.postsService.createPost(
-        userId, body,
-    )
+    await qr.connect();
 
-    for (let i = 0; i < body.images.length; i++) {
-      await this.postsService.createPostImage({
-        post,
-        order: i,
-        path: body.images[i],
-        type: ImageModelType.POST_IMAGE,
-      });
+    await qr.startTransaction();
+
+    try {
+      const post = await this.postsService.createPost(
+          userId, body,
+      )
+      for (let i = 0; i < body.images.length; i++) {
+        await this.postsImagesService.createPostImage({
+          post,
+          order: i,
+          path: body.images[i],
+          type: ImageModelType.POST_IMAGE,
+        });
+      }
+
+      await qr.commitTransaction();
+
+      return this.postsService.getPostById(post.id)
+    } catch (e) {
+      await qr.rollbackTransaction();
+      await qr.release();
     }
-
-    return this.postsService.getPostById(post.id)
   }
   @Patch(':id')
   patchPost(

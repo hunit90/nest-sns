@@ -12,6 +12,7 @@ import {POST_IMAGE_PATH} from "../common/const/path.const";
 import { extname } from 'path';
 import {v4 as uuid} from 'uuid';
 import {ImageModel} from "../common/entity/image.entity";
+import {PostsImagesService} from "./iamge/images.service";
 
 @Module({
   imports: [
@@ -24,6 +25,6 @@ import {ImageModel} from "../common/entity/image.entity";
       CommonModule,
   ],
   controllers: [PostsController],
-  providers: [PostsService],
+  providers: [PostsService, PostsImagesService],
 })
 export class PostsModule {}
