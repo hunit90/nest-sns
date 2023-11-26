@@ -20,6 +20,7 @@ import {
 } from "./common/const/env-keys.const";
 import {ServeStaticModule} from "@nestjs/serve-static";
 import {PUBLIC_FOLDER_PATH} from "./common/const/path.const";
+import {ImageModel} from "./common/entity/image.entity";
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import {PUBLIC_FOLDER_PATH} from "./common/const/path.const";
         entities: [
             PostsModel,
             UsersModel,
+            ImageModel,
         ],
         synchronize: true,
       }),

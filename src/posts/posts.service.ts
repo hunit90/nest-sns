@@ -11,62 +11,26 @@ import {ENV_HOST_KEY, ENV_PROTOCOL_KEY} from "../common/const/env-keys.const";
 import {POST_IMAGE_PATH, PUBLIC_FOLDER_PATH} from "../common/const/path.const";
 import {basename, join} from "path";
 import {promises} from "fs";
+import {CreatePostImageDto} from "./iamge/dto/create-image.dto";
+import {ImageModel} from "../common/entity/image.entity";
+import {DEFAULT_POST_FIND_OPTIONS} from "./const/default-post-find-options.const";
 
-/**
- * author: string;
- * title: string;
- * content: string;
- * likeCount: number;
- * commentCount: number;
- */
 
-export interface PostModel {
-    id: number;
-    author: string;
-    title: string;
-    content: string;
-    likeCount: number;
-    commentCount: number;
-}
 
-let posts : PostModel[] = [
-    {
-        id: 1,
-        author: 'newjeans_official',
-        title: '뉴진스 민지',
-        content: '메이크업 고치고 있는 민지',
-        likeCount: 1000,
-        commentCount: 9999,
-    },
-    {
-        id: 2,
-        author: 'newjeans_official',
-        title: '뉴진스 해린',
-        content: '노래 연습 하고 있는 해린',
-        likeCount: 1000,
-        commentCount: 9999,
-    },
-    {
-        id: 3,
-        author: 'blackpink_official',
-        title: '블랙핑크 로제',
-        content: '메이크업 고치고 있는 로제',
-        likeCount: 1000,
-        commentCount: 9999,
-    },
-]
 
 @Injectable()
 export class PostsService {
     constructor(
         @InjectRepository(PostsModel)
         private readonly postsRepository: Repository<PostsModel>,
+        @InjectRepository(ImageModel)
+        private readonly imageRepository: Repository<ImageModel>,
         private readonly commonService: CommonService,
         private readonly configService: ConfigService,
     ) {}
     async getAllPosts() {
         return this.postsRepository.find({
-            relations: ['author']
+            ...DEFAULT_POST_FIND_OPTIONS,
         });
     }
 
@@ -75,6 +39,7 @@ export class PostsService {
             await this.createPost(userId, {
                 title: `test post title ${i}`,
                 content: `test post content ${i}`,
+                images: [],
             })
         }
     }
@@ -84,7 +49,7 @@ export class PostsService {
             dto,
             this.postsRepository,
             {
-                relations: ['author']
+                ...DEFAULT_POST_FIND_OPTIONS,
             },
             'posts')
         // if (dto.page) {
@@ -164,10 +129,10 @@ export class PostsService {
 
     async getPostById(id: number) {
         const post = await this.postsRepository.findOne({
+            ...DEFAULT_POST_FIND_OPTIONS,
             where: {
                 id: id,
             },
-            relations: ['author']
         });
 
         if (!post) {
@@ -176,10 +141,10 @@ export class PostsService {
         return post;
     }
 
-    async createPostImage(dto: CreatePostDto){
+    async createPostImage(dto: CreatePostImageDto){
         const tempFilePath = join(
             PUBLIC_FOLDER_PATH,
-            dto.image,
+            dto.path,
         )
 
         try {
@@ -195,9 +160,13 @@ export class PostsService {
             fileName,
         )
 
+        const result = await this.imageRepository.save({
+            ...dto,
+        })
+
         await promises.rename(tempFilePath, newPath)
 
-        return true;
+        return result;
     }
 
     async createPost(authorId: number, postDto: CreatePostDto, image?: string) {
@@ -209,7 +178,7 @@ export class PostsService {
                 id: authorId,
             },
             ...postDto,
-            image,
+            images: [],
             likeCount: 0,
             commentCount: 0,
         });

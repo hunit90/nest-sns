@@ -11,11 +11,13 @@ import multer from "multer";
 import {POST_IMAGE_PATH} from "../common/const/path.const";
 import { extname } from 'path';
 import {v4 as uuid} from 'uuid';
+import {ImageModel} from "../common/entity/image.entity";
 
 @Module({
   imports: [
       TypeOrmModule.forFeature([
           PostsModel,
+          ImageModel,
       ]),
       AuthModule,
       UsersModule,
