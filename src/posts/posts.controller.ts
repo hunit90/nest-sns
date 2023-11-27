@@ -1,4 +1,16 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards,} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import {PostsService} from './posts.service';
 import {AccessTokenGuard} from "../auth/guard/bearer-token.guard";
 import {UsersModel} from "../users/entities/users.entity";
@@ -7,8 +19,11 @@ import {CreatePostDto} from "./dto/create-post.dto";
 import {UpdatePostDto} from "./dto/update-post.dto";
 import {PaginatePostDto} from "./dto/paginate-post.dto";
 import {ImageModelType} from "../common/entity/image.entity";
-import {DataSource} from "typeorm";
+import {DataSource, QueryRunner as QR} from "typeorm";
 import {PostsImagesService} from "./iamge/images.service";
+import {LogInterceptor} from "../common/interceptor/log.interceptor";
+import {TransactionInterceptor} from "../common/interceptor/transaction.interceptor";
+import {QueryRunner} from "../common/decorator/query-runner.decorator";
 
 
 @Controller('posts')
@@ -20,6 +35,7 @@ export class PostsController {
   ) {}
 
   @Get()
+  @UseInterceptors(LogInterceptor)
   getPosts(
       @Query() query: PaginatePostDto,
   ) {
@@ -41,19 +57,14 @@ export class PostsController {
 
   @Post()
   @UseGuards(AccessTokenGuard)
+  @UseInterceptors(TransactionInterceptor)
   async postPost(
       @User('id') userId: number,
       @Body() body: CreatePostDto,
+      @QueryRunner() qr: QR,
   ) {
-    const qr = this.dataSource.createQueryRunner();
-
-    await qr.connect();
-
-    await qr.startTransaction();
-
-    try {
       const post = await this.postsService.createPost(
-          userId, body,
+          userId, body, qr
       )
       for (let i = 0; i < body.images.length; i++) {
         await this.postsImagesService.createPostImage({
@@ -61,16 +72,10 @@ export class PostsController {
           order: i,
           path: body.images[i],
           type: ImageModelType.POST_IMAGE,
-        });
+        }, qr);
       }
 
-      await qr.commitTransaction();
-
-      return this.postsService.getPostById(post.id)
-    } catch (e) {
-      await qr.rollbackTransaction();
-      await qr.release();
-    }
+      return this.postsService.getPostById(post.id, qr)
   }
   @Patch(':id')
   patchPost(
