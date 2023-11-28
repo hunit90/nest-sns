@@ -1,4 +1,4 @@
-import {BadRequestException, Module} from '@nestjs/common';
+import {BadRequestException, MiddlewareConsumer, Module, NestModule, RequestMethod} from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import {TypeOrmModule} from "@nestjs/typeorm";
@@ -13,6 +13,7 @@ import { extname } from 'path';
 import {v4 as uuid} from 'uuid';
 import {ImageModel} from "../common/entity/image.entity";
 import {PostsImagesService} from "./iamge/images.service";
+import {LogMiddleware} from "../common/middleware/log.middleware";
 
 @Module({
   imports: [
@@ -27,4 +28,5 @@ import {PostsImagesService} from "./iamge/images.service";
   controllers: [PostsController],
   providers: [PostsService, PostsImagesService],
 })
-export class PostsModule {}
+export class PostsModule {
+}
