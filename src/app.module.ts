@@ -55,7 +55,7 @@ import {ChatsModel} from "./chats/entity/chats.entity";
             PostsModel,
             UsersModel,
             ImageModel,
-            ChatsModel,
+            ChatsModel
         ],
         synchronize: true,
       }),
