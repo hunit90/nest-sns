@@ -50,7 +50,9 @@ export class UsersModel extends BaseModel {
     @Length(3, 8, {
         message: lengthValidationMessage,
     })
-    @Exclude()
+    @Exclude({
+        toPlainOnly: true,
+    })
     password: string;
 
     @Column({
