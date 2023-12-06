@@ -1,7 +1,7 @@
 import {
     ConnectedSocket,
     MessageBody,
-    OnGatewayConnection,
+    OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit,
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer, WsException
@@ -22,7 +22,7 @@ import {AuthService} from "../auth/auth.service";
 @WebSocketGateway({
     namespace: 'chats'
 })
-export class ChatsGateway implements OnGatewayConnection {
+export class ChatsGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
     constructor(
         private readonly chatsService: ChatsService,
         private readonly messagesService: ChatsMessagesService,
@@ -33,6 +33,14 @@ export class ChatsGateway implements OnGatewayConnection {
 
     @WebSocketServer()
     server: Server;
+
+    afterInit(server: any): any {
+        console.log(`after gateway init`)
+    }
+
+    handleDisconnect(socket: Socket) {
+        console.log(`on disconnect called : ${socket.id}`)
+    }
 
     async handleConnection(socket: Socket & {user: UsersModel}) {
         console.log(`on connect called : ${socket.id}`)
