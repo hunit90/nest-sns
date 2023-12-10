@@ -1,6 +1,6 @@
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {CommonService} from "../../common/common.service";
-import {PaginateCommentsDto} from "../../common/dto/paginate-comments.dto";
+import {PaginateCommentsDto} from "./dto/paginate-comments.dto";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CommentsModel} from "./entity/comments.entity";
 import {Repository} from "typeorm";
