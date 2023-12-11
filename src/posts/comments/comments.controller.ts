@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards} from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import {PaginateCommentsDto} from "./dto/paginate-comments.dto";
 import {AccessTokenGuard} from "../../auth/guard/bearer-token.guard";
@@ -54,6 +54,14 @@ export class CommentsController {
         body,
         commentId,
     )
+  }
+
+  @Delete(':commentId')
+  @UseGuards(AccessTokenGuard)
+  async deleteComment(
+      @Param('commentId', ParseIntPipe) commentId: number,
+  ) {
+    return this.commentsService.deleteComment(commentId)
   }
 
 }
