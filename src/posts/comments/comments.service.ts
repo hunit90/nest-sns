@@ -7,6 +7,7 @@ import {Repository} from "typeorm";
 import {CreateCommentsDto} from "./dto/create-comments.dto";
 import {UsersModel} from "../../users/entity/users.entity";
 import {DEFAULT_COMMENT_FIND_OPTIONS} from "./const/default-commnt-find-options.const";
+import {UpdateCommentDto} from "./dto/update-comment.dto";
 
 @Injectable()
 export class CommentsService {
@@ -59,5 +60,21 @@ export class CommentsService {
             },
             author,
         })
+    }
+
+    async updateComment(
+        dto: UpdateCommentDto,
+        commentId: number,
+    ) {
+        const prevComment = await this.commentsRepository.preload({
+            id: commentId,
+            ...dto,
+        })
+
+        const newComment = await this.commentsRepository.save(
+            prevComment,
+        )
+
+        return newComment
     }
 }
