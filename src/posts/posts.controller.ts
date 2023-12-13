@@ -39,7 +39,7 @@ export class PostsController {
   ) {}
 
   @Get()
-  @UseInterceptors(LogInterceptor)
+  // @UseInterceptors(LogInterceptor)
   getPosts(
       @Query() query: PaginatePostDto,
   ) {
