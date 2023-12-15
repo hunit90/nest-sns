@@ -28,6 +28,7 @@ import {QueryRunner} from "../common/decorator/query-runner.decorator";
 import {HttpExceptionFilter} from "../common/exception-filter/http.exception-filter";
 import {RolesEnum} from "../users/const/roles.const";
 import {Roles} from "../users/decorator/roles.decorator";
+import {IsPublic} from "../common/decorator/is-public.decorator";
 
 
 @Controller('posts')
@@ -39,6 +40,7 @@ export class PostsController {
   ) {}
 
   @Get()
+  @IsPublic()
   // @UseInterceptors(LogInterceptor)
   getPosts(
       @Query() query: PaginatePostDto,
@@ -47,7 +49,6 @@ export class PostsController {
   }
 
   @Post('random')
-  @UseGuards(AccessTokenGuard)
   async postPostRandom(@User() user: UsersModel) {
     await this.postsService.generatePosts(user.id);
 
@@ -55,12 +56,12 @@ export class PostsController {
   }
 
   @Get(':id')
+  @IsPublic()
   getPost(@Param('id', ParseIntPipe) id: number) {
     return  this.postsService.getPostById(id);
   }
 
   @Post()
-  @UseGuards(AccessTokenGuard)
   @UseInterceptors(TransactionInterceptor)
   async postPost(
       @User('id') userId: number,
@@ -92,7 +93,6 @@ export class PostsController {
   }
 
   @Delete(':id')
-  @UseGuards(AccessTokenGuard)
   @Roles(RolesEnum.ADMIN)
   deletePost(
       @Param('id', ParseIntPipe) id: number,
