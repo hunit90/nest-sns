@@ -7,6 +7,7 @@ import {UsersModel} from "../../users/entity/users.entity";
 import {User} from "../../users/decorator/user.decorator";
 import {UpdateCommentDto} from "./dto/update-comment.dto";
 import {IsPublic} from "../../common/decorator/is-public.decorator";
+import {IsCommentMineOrAdminGuard} from "./guard/is-comment-mine-or-admin.guard";
 
 @Controller('posts/:postId/comments')
 export class CommentsController {
@@ -47,6 +48,7 @@ export class CommentsController {
   }
 
   @Patch(':commentId')
+  @UseGuards(IsCommentMineOrAdminGuard)
   async patchComment(
       @Param('commentId', ParseIntPipe) commentId: number,
       @Body() body: UpdateCommentDto,
@@ -58,6 +60,7 @@ export class CommentsController {
   }
 
   @Delete(':commentId')
+  @UseGuards(IsCommentMineOrAdminGuard)
   async deleteComment(
       @Param('commentId', ParseIntPipe) commentId: number,
   ) {

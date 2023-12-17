@@ -29,6 +29,7 @@ import {HttpExceptionFilter} from "../common/exception-filter/http.exception-fil
 import {RolesEnum} from "../users/const/roles.const";
 import {Roles} from "../users/decorator/roles.decorator";
 import {IsPublic} from "../common/decorator/is-public.decorator";
+import {IsPostMineOrAdminGuard} from "./guard/is-post-mine-or-admin.guard";
 
 
 @Controller('posts')
@@ -83,6 +84,7 @@ export class PostsController {
       return this.postsService.getPostById(post.id, qr)
   }
   @Patch(':id')
+  @UseGuards(IsPostMineOrAdminGuard)
   patchPost(
       @Param('id', ParseIntPipe) id: number,
       @Body() body: UpdatePostDto
