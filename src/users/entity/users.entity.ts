@@ -77,8 +77,8 @@ export class UsersModel extends BaseModel {
     messages: MessagesModel;
 
     @OneToMany(() => UserFollowersModel, (ufm) => ufm.follower)
-    followers: UsersModel[]
+    followers: UserFollowersModel[]
 
     @OneToMany(() => UserFollowersModel, (ufm) => ufm.followee)
-    followees: UsersModel[]
+    followees: UserFollowersModel[]
 }
