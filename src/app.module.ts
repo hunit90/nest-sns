@@ -1,26 +1,11 @@
-import {
-    ClassSerializerInterceptor,
-    MiddlewareConsumer,
-    Module,
-    NestMiddleware,
-    NestModule,
-    RequestMethod
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import {ConfigModule} from "@nestjs/config";
-import * as process from "process";
+import { AppService } from './app.service';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
+  imports: [PostsModule],
   controllers: [AppController],
-  providers: [
-  ],
+  providers: [AppService],
 })
-export class AppModule implements NestModule {
-    configure(consumer: MiddlewareConsumer): any {
-        consumer.apply(
-        ).forRoutes({
-            path: '*',
-            method: RequestMethod.GET,
-        })
-    }
-}
+export class AppModule {}
