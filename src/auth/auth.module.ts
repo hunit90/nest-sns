@@ -11,6 +11,7 @@ import {UsersModule} from "../users/users.module";
       JwtModule.register({}),
       UsersModule,
   ],
+  exports: [AuthService],
   controllers: [AuthController],
   providers: [AuthService],
 })
