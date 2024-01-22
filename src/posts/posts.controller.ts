@@ -8,13 +8,14 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Put, UseGuards, Request
+  Put, UseGuards, Request, Patch
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import {AccessTokenGuard} from "../auth/guard/bearer-token.guard";
 import {UsersModel} from "../users/entities/users.entity";
 import {User} from "../users/decorator/user.decorator";
 import {CreatePostDto} from "./dto/create-post.dto";
+import {UpdatePostDto} from "./dto/update-post.dto";
 
 
 @Controller('posts')
@@ -42,14 +43,13 @@ export class PostsController {
     )
   }
 
-  @Put(':id')
-  putPost(
+  @Patch(':id')
+  patchPost(
       @Param('id', ParseIntPipe) id: number,
-      @Body('title') title?: string,
-      @Body('content') content?: string,
+      @Body() body: UpdatePostDto,
   ) {
     return this.postsService.updatePost(
-        id, title, content
+        id, body
     )
   }
 
