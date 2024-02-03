@@ -8,7 +8,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Put, UseGuards, Request, Patch
+  Put, UseGuards, Request, Patch, UseInterceptors, ClassSerializerInterceptor
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import {AccessTokenGuard} from "../auth/guard/bearer-token.guard";
